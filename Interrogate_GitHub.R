@@ -7,29 +7,29 @@ library(httpuv)
 #install.packages("httr")
 library(httr)
 
-# Can be github, linkedin etc depending on application
+# Interrogate GitHub
 oauth_endpoints("github")
-
-# Change based on what you 
-myapp <- oauth_app(appname = "Access_GitHub",
+    
+# Access GitHub App 
+githubApp <- oauth_app(appname = "Access_GitHub",
                    key = "8cfb843e259927eb7002",
                    secret = "46c553c55adb9942a6d030940fb6b5bf8e9029c5")
 
 # Get OAuth credentials
-github_token <- oauth2.0_token(oauth_endpoints("github"), myapp)
+github_token <- oauth2.0_token(oauth_endpoints("github"), githubApp)
 
 # Use API
-gtoken <- config(token = github_token)
-req <- GET("https://api.github.com/users/okeeling/repos", gtoken)
+myToken <- config(token = github_token)
+followingData <- GET("https://api.github.com/users/okeeling/repos", myToken)
 
 # Take action on http error
-stop_for_status(req)
+stop_for_status(followingData)
 
 # Extract content from a request
-json1 = content(req)
+followingDataContent = content(followingData)
 
-# Convert to a data.frame
-gitDF = jsonlite::fromJSON(jsonlite::toJSON(json1))
+# Save users' data in a dataframe
+dataFrame = jsonlite::fromJSON(jsonlite::toJSON(followingDataContent))
 
 # Subset data.frame
-gitDF[gitDF$full_name == "okeeling/datasharing", "created_at"] 
+dataFrame[dataFrame$full_name == "okeeling/datasharing", "created_at"] 
