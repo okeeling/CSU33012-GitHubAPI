@@ -33,3 +33,18 @@ dataFrame = jsonlite::fromJSON(jsonlite::toJSON(followingDataContent))
 
 # Subset data.frame
 dataFrame[dataFrame$full_name == "okeeling/datasharing", "created_at"] 
+
+
+#Retrieve usernames and save in a vector
+id = dataFrame$login
+user_ids = c(id)
+
+#Create empty vectors and data frame
+allUsers = c()
+allUsersDF = data.frame(
+  Username = integer(),
+  Following = integer(),
+  Followers = integer(),
+  Repositories = integer(),
+  DateCreated = integer()
+)
