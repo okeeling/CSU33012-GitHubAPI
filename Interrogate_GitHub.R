@@ -34,7 +34,6 @@ dataFrame = jsonlite::fromJSON(jsonlite::toJSON(followingDataContent))
 # Subset data.frame
 dataFrame[dataFrame$full_name == "okeeling/datasharing", "created_at"] 
 
-
 #Retrieve usernames and save in a vector
 id = dataFrame$login
 user_ids = c(id)
@@ -42,9 +41,23 @@ user_ids = c(id)
 #Create empty vectors and data frame
 allUsers = c()
 allUsersDF = data.frame(
-  Username = integer(),
-  Following = integer(),
-  Followers = integer(),
-  Repositories = integer(),
-  DateCreated = integer()
+  username = integer(),
+  following = integer(),
+  followers = integer(),
+  repositories = integer(),
+  dateCreated = integer()
 )
+
+
+#Loop through list of usernames to find users to add to the list
+for (i in 1:length(user_ids)) {
+  #Retrieve an individual users following list
+  followingUrl = paste("https://api.github.com/users/", user_ids[i], "/following", sep = "")
+  following = GET(followingUrl, myToken)
+  followingContent = content(following)
+  
+  #Skip the user if they do not follow anybody
+  if (length(followingContent) == 0) {
+    next
+  }
+}
