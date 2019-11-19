@@ -60,4 +60,8 @@ for (i in 1:length(user_ids)) {
   if (length(followingContent) == 0) {
     next
   }
+  
+  #Add followings to a dataframe and retrieve usernames
+  followingDF = jsonlite::fromJSON(jsonlite::toJSON(followingContent))
+  followingLogin = followingDF$login
 }
