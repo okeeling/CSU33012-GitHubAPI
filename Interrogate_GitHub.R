@@ -51,6 +51,7 @@ allUsersDF = data.frame(
 
 #Loop through list of usernames to find users to add to the list
 for (i in 1:length(user_ids)) {
+  
   #Retrieve an individual users following list
   followingUrl = paste("https://api.github.com/users/", user_ids[i], "/following", sep = "")
   following = GET(followingUrl, myToken)
@@ -64,4 +65,36 @@ for (i in 1:length(user_ids)) {
   #Add followings to a dataframe and retrieve usernames
   followingDF = jsonlite::fromJSON(jsonlite::toJSON(followingContent))
   followingLogin = followingDF$login
+  
+  #Loop through 'following' users
+  for (j in 1:length(followingLogin)) {
+    
+    #Check that the user is not already in the list of users
+    if (is.element(followingLogin[j], allUsers) == FALSE) {
+      
+      #Add user to list of users
+      allUsers[length(allUsers) + 1] = followingLogin[j]
+      
+      #Retrieve data on each user
+      followingUrl2 = paste("https://api.github.com/users/", followingLogin[j], sep = "")
+      following2 = GET(followingUrl2, myToken)
+      followingContent2 = content(following2)
+      followingDF2 = jsonlite::fromJSON(jsonlite::toJSON(followingContent2))
+      
+      #Retrieve each users following
+      followingNumber = followingDF2$following
+      
+      #Retrieve each users followers
+      followersNumber = followingDF2$followers
+      
+      #Retrieve each users number of repositories
+      reposNumber = followingDF2$public_repos
+     
+      #Retrieve year which each user joined Github
+      yearCreated = substr(followingDF2$created_at, start = 1, stop = 4)
+      
+      #Add users data to a new row in dataframe
+      allUsersDF[nrow(allUsersDF) + 1, ] = c(followingLogin[j], followingNumber, followersNumber, reposNumber, yearCreated)
+    }
+  }
 }
