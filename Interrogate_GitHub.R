@@ -6,6 +6,10 @@ library(jsonlite)
 library(httpuv)
 #install.packages("httr")
 library(httr)
+#install.packages("plotly")
+library(plotly)
+#install.packages("devtools")
+library(devtools)
 
 # Interrogate GitHub
 oauth_endpoints("github")
@@ -59,6 +63,16 @@ myData$public_repos
 repositories = fromJSON("https://api.github.com/users/okeeling/repos")
 repositories$name
 repositories$created_at
+
+# For this assignment I used Fabien Potencier's GitHub account - fabpot
+# He is one of the most popular developers on GitHub with almost 10k followers
+# In addition, he is one of the most active develops on the site
+# Began to interrogate Fabien Potencier's account to produce graphs, by first looking at his followers
+myData = GET("https://api.github.com/users/fabpot/followers?per_page=100;", myToken)
+stop_for_status(myData)
+extract = content(myData)
+dataFrame = jsonlite::fromJSON(jsonlite::toJSON(extract))
+dataFrame$login
 
 #Retrieve usernames and save in a vector
 id = dataFrame$login
@@ -121,11 +135,27 @@ for (i in 1:length(user_ids)) {
       #Add users data to a new row in dataframe
       allUsersDF[nrow(allUsersDF) + 1, ] = c(followingLogin[j], followingNumber, followersNumber, reposNumber, yearCreated)
     }
+    next
   }
   
   #Stop when there are more than 200 users
-  if(length(allUsers) > 200)
-  {
+  if(length(allUsers) > 200) {
     break
   }
+  next
 }
+
+#Created link to plotly which creates online interactive graphs.
+Sys.setenv("plotly_username"="okeeling")
+Sys.setenv("plotly_api_key"="SP3bYV33xvTUsIr9CJu9")
+
+
+# Plot #1 - Repositories vs Followers By Year
+# The data is from 200 of Fabien Potencier's followers
+# The y-axis displays the number of followers of each of Fabien Potencier's followers
+# The y-axis displays the number of repositories of each of Fabien Potencier's followers
+plot1 = plot_ly(data = allUsersDF, x = ~repos, y = ~followers, text = ~paste("Followers: ", followers, "<br>Repositories: ", repos, "<br>Date Created:", dateCreated), color = ~dateCreated)
+plot1
+# Sends graph to plotly
+api_create(plot1, filename = "Repositories vs Followers")
+# Plot 1 - Repositories vs Followers - Attached plot uploaded onto GitHub
