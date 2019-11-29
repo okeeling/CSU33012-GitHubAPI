@@ -170,3 +170,52 @@ plot2
 #Sends graph to plotly
 api_create(plot2, filename = "Following vs Followers")
 #Plot 2 - Following vs Followers - Attached plot uploaded onto GitHub
+
+
+# Plot #3 - 10 Most Popular Languages 
+languages = c()
+for (i in 1:length(user_ids)) {
+  
+  RepositoriesUrl = paste("https://api.github.com/users/", user_ids[i], "/repos", sep = "")
+  Repositories = GET(RepositoriesUrl, myToken)
+  RepositoriesContent = content(Repositories)
+  RepositoriesDF = jsonlite::fromJSON(jsonlite::toJSON(RepositoriesContent))
+  RepositoriesNames = RepositoriesDF$name
+  
+  #Loop through all the repositories of an individual user
+  for (j in 1: length(RepositoriesNames)) {
+    
+    #Find all repositories and save in data frame
+    RepositoriesUrl2 = paste("https://api.github.com/repos/", user_ids[i], "/", RepositoriesNames[j], sep = "")
+    Repositories2 = GET(RepositoriesUrl2, myToken)
+    RepositoriesContent2 = content(Repositories2)
+    RepositoriesDF2 = jsonlite::fromJSON(jsonlite::toJSON(RepositoriesContent2))
+    language = RepositoriesDF2$language
+    
+    #Removes repositories containing no specific languages
+    if (length(language) != 0 && language != "<NA>") {
+      languages[length(languages)+1] = language
+    }
+    next
+  }
+  next
+}
+
+# Inserts the 10 most popular languages into a table
+allLanguages = sort(table(languages), increasing=TRUE)
+top10Languages = allLanguages[(length(allLanguages)-9):length(allLanguages)]
+
+# Converts it to a dataframe
+languageDF = as.data.frame(top10Languages)
+
+# Plot #3 - 10 Most Popular Languages 
+# The data is from the same 200 followers of Fabien Potencier's is represented by a pie chart
+# The above loops obtain the programming languages from the repositories of the 200 followers
+# PHP was the most popular programming language and CoffeeScript was the least popular programming language
+plot3 = plot_ly(data = languageDF, labels = ~languageDF$languages, values = ~languageDF$Freq, type = "pie")
+plot3
+Sys.setenv("plotly_username"="okeeling")
+Sys.setenv("plotly_api_key"="SP3bYV33xvTUsIr9CJu9")
+#Sends graph to plotly
+api_create(plot3, filename = "10 Most Popular Languages")
+# Plot 3 - 10 Most Popular Languages - Attached pie chart uploaded onto GitHub
