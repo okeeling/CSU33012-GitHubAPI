@@ -159,3 +159,14 @@ plot1
 # Sends graph to plotly
 api_create(plot1, filename = "Repositories vs Followers")
 # Plot 1 - Repositories vs Followers - Attached plot uploaded onto GitHub
+
+
+# Plot #2 - Following vs Followers By Year
+# The data is from 200 of Fabien Potencier's followers and is represented by a scatter plot
+# The x-axis displays the number of followers of each of Fabien Potencier's followers
+# The y-axis displays the number of user each of Fabien Potencier's followers are following
+plot2 = plot_ly(data = allUsersDF, x = ~following, y = ~followers, text = ~paste("Followers: ", followers, "<br>Following: ", following), color = ~dateCreated)
+plot2
+#Sends graph to plotly
+api_create(plot2, filename = "Following vs Followers")
+#Plot 2 - Following vs Followers - Attached plot uploaded onto GitHub
